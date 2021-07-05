@@ -1,2 +1,2 @@
 # pemdocjs
-Programmable, extensible, and minimalistic JSDoc generator
+Programmable, extensible, and minimalistic API for JSDoc generation.

@@ -1,0 +1,42 @@
+{
+  "name": "pemdocjs",
+  "version": "0.1.0",
+  "description": "Programmable, extensible, and minimalistic API for JSDoc generation",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src/** --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brucehsu/pemdocjs.git"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "keywords": [
+    "jsdoc",
+    "node",
+    "parser",
+    "jsdoc3"
+  ],
+  "author": "Szu-Kai Hsu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brucehsu/pemdocjs/issues"
+  },
+  "homepage": "https://github.com/brucehsu/pemdocjs#readme",
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.23.4",
+    "jest": "^27.0.6"
+  },
+  "dependencies": {
+    "@babel/core": "7.10.4",
+    "@babel/generator": "7.12.5",
+    "@babel/parser": "7.12.5",
+    "@babel/traverse": "7.12.5"
+  }
+}
