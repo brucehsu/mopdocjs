@@ -14,8 +14,6 @@ type Parameter = {
   sources: Array<Object>
 };
 
-type DocAST = [?DocNode, Array<DocNode>];
-
 class DocNode {
   name: string;
 
@@ -69,6 +67,8 @@ class DocNode {
   }
 }
 
+type DocAST = [?DocNode, Array<DocNode>];
+
 module.exports = {
   build: async (indexes: Array<string>|string): Promise<Map<string, DocAST>> => {
     const babelOpts = {
@@ -99,7 +99,7 @@ module.exports = {
                 return parsed[0];
               }) ?? [];
               if (parsedComments.length === 0) {
-                continue;
+                break;
               }
               const nodeType = path.type.indexOf('Declaration') !== -1 ? path.type.split('Declaration')[0].toLowerCase() : 'function';
               const docNode = new DocNode({
