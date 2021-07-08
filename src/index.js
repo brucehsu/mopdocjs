@@ -4,8 +4,71 @@ const { parse } = require('@babel/parser');
 const { default: traverse } = require('@babel/traverse');
 const { parse: parseComment } = require('comment-parser/lib');
 
+const defaultScopeASTIndex = '_default';
+
+type Parameter = {
+  name: string,
+  type: string,
+  optional: boolean,
+  description: string,
+  sources: Array<Object>
+};
+
+class DocNode {
+  name: string;
+
+  description: string;
+
+  parameters: Array<?Parameter>;
+
+  returns: ?Parameter;
+
+  sources: Array<?Object>;
+
+  declarationType: "module" | "class" | "function";
+
+  constructor(options: {
+    name: string,
+    description: string,
+    tags: Array<Object>,
+    source: Array<Object>,
+    nodeType: "module" | "class" | "function"
+  }) {
+    const {name, description, tags, nodeType, source} = options;
+    this.name = name;
+    this.description = description;
+    this.declarationType = nodeType;
+    this.sources = source;
+    this.parameters = [];
+    tags.forEach((tag) => {
+      switch(tag.tag) {
+        case 'param':
+          this.parameters.push({
+            name: tag.name,
+            type: tag.type,
+            optional: tag.optional,
+            description: tag.description,
+            sources: tag.source
+          });
+          break;
+        case 'return':
+          this.returns = {
+            name: tag.name,
+            type: tag.type,
+            optional: tag.optional,
+            description: tag.description,
+            sources: tag.source
+          };
+          break;
+        default:
+          break;
+      }
+    });
+  }
+}
+
 module.exports = {
-  build: async (indexes: Array<string>|string, options: Object) => {
+  build: async (indexes: Array<string>|string): Object => {
     const babelOpts = {
       sourceType: "module",
       plugins: [
@@ -16,18 +79,42 @@ module.exports = {
       const data = fs.readFileSync(path);
       return data.toString();
     }
-    const processComments = (path: string) => {
-      const ast = parse(readSourceFromFile(path), babelOpts);
+    const docASTByIndexes = new Map();
+    docASTByIndexes.set(defaultScopeASTIndex, [null, []]);
+    const processComments = (index: string) => {
+      const ast = parse(readSourceFromFile(index), babelOpts);
+      const modulePathTypes = ['ModuleDeclaration', 'ClassDeclaration'];
+      const functionPathTypes = ['FunctionDeclaration', 'ClassMethod'];
+      const getNodeName = (node) => node?.key?.name ?? node?.id?.name;
       traverse(ast, {
         enter(path) {
-          ['ModuleDeclaration', 'ClassDeclaration', 'FunctionDeclaration', 'ClassMethod'].forEach((nodeClass) => {
+          for (const nodeClass of [...modulePathTypes, ...functionPathTypes]) {
             if (path[`is${nodeClass}`]()) {
-              path.node.leadingComments.forEach((commentBlock) => {
-                const parsed = parseComment(`/*${commentBlock.value}\n*/`)
-                console.log(parsed[0].tags);
+              const nodeName = getNodeName(path.node);
+              const parsedComments = path.node.leadingComments.map((commentBlock) => {
+                const parsed = parseComment(`/*${commentBlock.value}\n*/`);
+                return parsed[0];
               });
+              const nodeType = path.type.indexOf('Declaration') !== -1 ? path.type.split('Declaration')[0].toLowerCase() : 'function';
+              const docNode = new DocNode({
+                name: nodeName,
+                nodeType,
+                ...parsedComments[0]
+              })
+              if (nodeType === 'function') {
+                const parentPath = path.findParent((parentCandidate) => parentCandidate.isClassDeclaration() || parentCandidate.isModuleDeclaration());
+                const parentNodeName = getNodeName(parentPath?.node);
+                if (docASTByIndexes.has(parentNodeName)) {
+                  docASTByIndexes.get(parentNodeName)[1].push(docNode);
+                } else {
+                  docASTByIndexes.get(defaultScopeASTIndex).push(docNode);
+                }
+              } else {
+                docASTByIndexes.set(nodeName, [docNode, []]);
+              }
+              break;
             }
-          });
+          }
         },
       });
     }
@@ -36,5 +123,7 @@ module.exports = {
     } else {
       indexes.forEach(processComments);
     }
+
+    return docASTByIndexes;
   }
 };

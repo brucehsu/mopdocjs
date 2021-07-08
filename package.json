@@ -1,7 +1,7 @@
 {
-  "name": "pemdocjs",
+  "name": "mopdocjs",
   "version": "0.1.0",
-  "description": "Programmable, extensible, and minimalistic API for JSDoc generation",
+  "description": "Minimalistic, opinionated, and programmable API for JSDoc generation",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brucehsu/pemdocjs.git"
+    "url": "git+https://github.com/brucehsu/mopdocjs.git"
   },
   "engines": {
     "node": ">=12"
@@ -23,10 +23,11 @@
   "author": "Szu-Kai Hsu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brucehsu/pemdocjs/issues"
+    "url": "https://github.com/brucehsu/mopdocjs/issues"
   },
-  "homepage": "https://github.com/brucehsu/pemdocjs#readme",
+  "homepage": "https://github.com/brucehsu/mopdocjs#readme",
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
