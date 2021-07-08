@@ -14,6 +14,8 @@ type Parameter = {
   sources: Array<Object>
 };
 
+type DocAST = [?DocNode, Array<DocNode>];
+
 class DocNode {
   name: string;
 
@@ -68,7 +70,7 @@ class DocNode {
 }
 
 module.exports = {
-  build: async (indexes: Array<string>|string): Map => {
+  build: async (indexes: Array<string>|string): Promise<Map<string, DocAST>> => {
     const babelOpts = {
       sourceType: "module",
       plugins: [
@@ -79,8 +81,9 @@ module.exports = {
       const data = fs.readFileSync(path);
       return data.toString();
     }
-    const docASTByIndexes = new Map();
-    docASTByIndexes.set(defaultScopeASTIndex, [null, []]);
+    const docASTByIndexes: Map<string, DocAST> = new Map();
+    const defaultScopeAST: DocAST = [null, []];
+    docASTByIndexes.set(defaultScopeASTIndex, defaultScopeAST);
     const processComments = (index: string) => {
       const ast = parse(readSourceFromFile(index), babelOpts);
       const modulePathTypes = ['ModuleDeclaration', 'ClassDeclaration'];
@@ -107,11 +110,8 @@ module.exports = {
               if (nodeType === 'function') {
                 const parentPath = path.findParent((parentCandidate) => parentCandidate.isClassDeclaration() || parentCandidate.isModuleDeclaration());
                 const parentNodeName = getNodeName(parentPath?.node);
-                if (docASTByIndexes.has(parentNodeName)) {
-                  docASTByIndexes.get(parentNodeName)[1].push(docNode);
-                } else {
-                  docASTByIndexes.get(defaultScopeASTIndex).push(docNode);
-                }
+                const docASTNode: DocAST = docASTByIndexes.get(parentNodeName) ?? defaultScopeAST;
+                docASTNode[1].push(docNode);
               } else {
                 docASTByIndexes.set(nodeName, [docNode, []]);
               }
