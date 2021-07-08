@@ -53,10 +53,10 @@ class DocNode {
                     break;
                 case 'return':
                     this.returns = {
-                        name: tag.name,
+                        name: '',
                         type: tag.type,
                         optional: tag.optional,
-                        description: tag.description,
+                        description: `${tag.name} ${tag.description}`,
                         sources: tag.source
                     };
                     break;
@@ -131,4 +131,5 @@ async function buildAST(indexes: Array<string>|string): Promise<Map<string, DocA
 
 module.exports = {
     buildAST,
+    defaultScopeASTIndex
 }
