@@ -1,2 +1,2 @@
-# pemdocjs
-Programmable, extensible, and minimalistic API for JSDoc generation.
+# mopdocjs
+Minimalistic, opinionated, and programmable API for JSDoc generation.
