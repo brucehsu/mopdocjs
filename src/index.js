@@ -68,7 +68,7 @@ class DocNode {
 }
 
 module.exports = {
-  build: async (indexes: Array<string>|string): Object => {
+  build: async (indexes: Array<string>|string): Map => {
     const babelOpts = {
       sourceType: "module",
       plugins: [
@@ -91,10 +91,13 @@ module.exports = {
           for (const nodeClass of [...modulePathTypes, ...functionPathTypes]) {
             if (path[`is${nodeClass}`]()) {
               const nodeName = getNodeName(path.node);
-              const parsedComments = path.node.leadingComments.map((commentBlock) => {
+              const parsedComments = path.node?.leadingComments?.map((commentBlock) => {
                 const parsed = parseComment(`/*${commentBlock.value}\n*/`);
                 return parsed[0];
-              });
+              }) ?? [];
+              if (parsedComments.length === 0) {
+                continue;
+              }
               const nodeType = path.type.indexOf('Declaration') !== -1 ? path.type.split('Declaration')[0].toLowerCase() : 'function';
               const docNode = new DocNode({
                 name: nodeName,
