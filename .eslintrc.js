@@ -8,7 +8,6 @@ module.exports = {
     'airbnb-base',
     'prettier'
   ],
-
   parser: "babel-eslint",
   parserOptions: {
     ecmaVersion: 12,
