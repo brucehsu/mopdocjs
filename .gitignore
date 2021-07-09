@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# IntelliJ IDEA files to ignore
+.idea/
+
+# Others
+.temp/
