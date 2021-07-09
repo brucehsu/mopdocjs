@@ -40,7 +40,7 @@ class DocNode {
         this.declarationType = nodeType;
         this.sources = source;
         this.parameters = [];
-        tags.forEach((tag) => {
+        tags?.forEach((tag) => {
             switch(tag.tag) {
                 case 'param':
                     this.parameters.push({
