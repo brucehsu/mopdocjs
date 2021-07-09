@@ -6,7 +6,7 @@ const { parse: parseComment } = require('comment-parser/lib');
 
 const defaultScopeASTIndex = '_default';
 
-type Parameter = {
+export type Parameter = {
     name: string,
     type: string,
     optional: boolean,
@@ -19,7 +19,7 @@ class DocNode {
 
     description: string;
 
-    parameters: Array<?Parameter>;
+    parameters: Array<Parameter>;
 
     returns: ?Parameter;
 
@@ -67,7 +67,7 @@ class DocNode {
     }
 }
 
-type DocAST = [?DocNode, Array<DocNode>];
+export type DocAST = [?DocNode, Array<DocNode>];
 
 async function buildAST(indexes: Array<string>|string): Promise<Map<string, DocAST>> {
     const babelOpts = {
@@ -131,5 +131,6 @@ async function buildAST(indexes: Array<string>|string): Promise<Map<string, DocA
 
 module.exports = {
     buildAST,
+    DocNode,
     defaultScopeASTIndex
 }
