@@ -19,7 +19,7 @@ function compileDocNode(node: ?DocNode, level: number = 2): string {
     let result = "\n";
 
     result += addHeader(name, level);
-    result += description != null ? description + "\n" : '';
+    result += description != null ? `${description  }\n` : '';
 
     if (parameters.length > 0) {
         result += addHeader('Parameters', level + 1);

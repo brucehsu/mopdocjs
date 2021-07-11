@@ -97,14 +97,47 @@ async function buildAST(indexes: Array<string>|string): Promise<Map<string, DocA
                             const parsed = parseComment(`/*${commentBlock.value}\n*/`);
                             return parsed[0];
                         }) ?? [];
-                        if (parsedComments.length === 0) {
+                        if (parsedComments.length !== 1) {
                             break;
                         }
+                        const [parsedComment] = parsedComments;
+                        path.node.params?.forEach((param) => {
+                            const isOptional = param.typeAnnotation?.typeAnnotation?.type?.startsWith('Nullable') ?? false;
+                            const findParamType = (annotation) => {
+                                if (annotation == null) {
+                                    return null;
+                                }
+                                if (annotation.typeAnnotation != null) {
+                                    return findParamType(annotation.typeAnnotation);
+                                }
+                                const [paramType] = annotation.type.split('TypeAnnotation');
+                                if (paramType === 'Generic') {
+                                    return annotation.id.name;
+                                }
+                                return paramType.toLowerCase();
+                            };
+                            const paramType = findParamType(param.typeAnnotation);
+                            const paramTag = parsedComment?.tags?.find((tag) => tag.name === param.name) ?? {
+                                name: param.name,
+                                tag: 'param',
+                                type: paramType,
+                                optional: isOptional,
+                                description: '',
+                                source: null
+                            };
+                            if (paramType != null) {
+                                if (paramTag.source === null) {
+                                    parsedComment.tags.push(paramTag);
+                                } else {
+                                    paramTag.type = paramType;
+                                }
+                            }
+                        });
                         const nodeType = path.type.indexOf('Declaration') !== -1 ? path.type.split('Declaration')[0].toLowerCase() : 'function';
                         const docNode = new DocNode({
                             name: nodeName,
                             nodeType,
-                            ...parsedComments[0]
+                            ...parsedComment
                         })
                         if (nodeType === 'function') {
                             const parentPath = path.findParent((parentCandidate) => parentCandidate.isClassDeclaration() || parentCandidate.isModuleDeclaration());
