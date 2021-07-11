@@ -1,6 +1,6 @@
 {
   "name": "mopdocjs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Minimalistic, opinionated, and programmable API for JSDoc generation",
   "main": "src/index.js",
   "scripts": {
